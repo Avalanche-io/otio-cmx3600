@@ -1,0 +1,14 @@
+TITLE:   Generator_References
+FCM: NON-DROP FRAME
+
+001  BLACK    V     C        00:00:00:00 00:00:03:00 00:00:00:00 00:00:03:00
+* FROM CLIP NAME: Black_Leader
+
+002  CLIP1    V     C        01:00:00:00 01:00:05:00 00:00:03:00 00:00:08:00
+* FROM CLIP NAME: Main_Clip
+
+003  BARS     V     C        00:00:00:00 00:00:05:00 00:00:08:00 00:00:13:00
+* FROM CLIP NAME: ColorBars
+
+004  BL       V     C        00:00:00:00 00:00:02:00 00:00:13:00 00:00:15:00
+* FROM CLIP NAME: Black_Tail

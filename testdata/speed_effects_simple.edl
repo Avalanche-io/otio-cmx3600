@@ -1,0 +1,13 @@
+TITLE:   Speed_Effects_Simple
+FCM: DROP FRAME
+
+001  CLIP1    V     C        01:00:00:00 01:00:02:00 00:00:00:00 00:00:02:00
+* FROM CLIP NAME: Normal_Speed_Clip
+
+002  CLIP2    V     C        01:00:05:00 01:00:07:00 00:00:02:00 00:00:04:00
+* FROM CLIP NAME: Fast_Motion_Clip
+M2   CLIP2       068.0                01:00:05:00
+
+003  CLIP3    V     C        01:00:10:00 01:00:15:00 00:00:04:00 00:00:09:00
+* FROM CLIP NAME: Slow_Motion_Clip
+M2   CLIP3       029.87               01:00:10:00

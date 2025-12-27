@@ -1,0 +1,15 @@
+TITLE:   CDL_Color_Correction
+FCM: NON-DROP FRAME
+
+001  CLIP1    V     C        01:00:00:00 01:00:02:00 00:00:00:00 00:00:02:00
+* FROM CLIP NAME: Normal_Grade
+
+002  CLIP2    V     C        01:00:05:00 01:00:07:00 00:00:02:00 00:00:04:00
+* FROM CLIP NAME: Color_Corrected_1
+* ASC_SOP (1.2 1.1 0.95) (0.05 -0.1 0.02) (1.0 1.05 0.98)
+* ASC_SAT 1.1
+
+003  CLIP3    V     C        01:00:10:00 01:00:12:00 00:00:04:00 00:00:06:00
+* FROM CLIP NAME: Color_Corrected_2
+* ASC_SOP (0.9, 0.95, 1.05) (-0.05, 0.02, -0.01) (1.1, 1.0, 0.95)
+* ASC_SAT 0.85

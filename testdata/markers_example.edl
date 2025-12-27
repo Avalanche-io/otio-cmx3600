@@ -1,0 +1,10 @@
+TITLE:   Markers_And_Locators
+FCM: NON-DROP FRAME
+
+001  CLIP1    V     C        01:00:00:00 01:00:10:00 00:00:00:00 00:00:10:00
+* FROM CLIP NAME: Marked_Clip
+* LOC: 01:00:01:00 RED Shot start
+* LOC: 01:00:03:00 GREEN Action begins
+* LOC: 01:00:05:00 BLUE Mid point
+* LOC: 01:00:07:00 YELLOW Action peak
+* LOC: 01:00:09:00 RED Shot end
