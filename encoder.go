@@ -8,8 +8,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mrjoshuak/gotio/opentime"
-	"github.com/mrjoshuak/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio/opentime"
+	"github.com/Avalanche-io/gotio/opentimelineio"
 )
 
 // Encoder writes OpenTimelineIO Timeline to CMX 3600 EDL format.
