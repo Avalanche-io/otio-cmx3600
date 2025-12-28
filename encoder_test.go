@@ -9,29 +9,29 @@ import (
 	"testing"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 func TestEncoder_SimpleTimeline(t *testing.T) {
 	// Create a simple timeline with one video track and two clips
-	timeline := opentimelineio.NewTimeline("Test Timeline", nil, nil)
-	track := opentimelineio.NewTrack("V", nil, opentimelineio.TrackKindVideo, nil, nil)
+	timeline := gotio.NewTimeline("Test Timeline", nil, nil)
+	track := gotio.NewTrack("V", nil, gotio.TrackKindVideo, nil, nil)
 
 	// Create first clip
 	sourceRange1 := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24), // 5 seconds
 	)
-	mediaRef1 := opentimelineio.NewExternalReference("Clip1", "Clip1", &sourceRange1, nil)
-	clip1 := opentimelineio.NewClip("Clip1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
+	mediaRef1 := gotio.NewExternalReference("Clip1", "Clip1", &sourceRange1, nil)
+	clip1 := gotio.NewClip("Clip1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
 
 	// Create second clip
 	sourceRange2 := opentime.NewTimeRange(
 		opentime.NewRationalTime(240, 24), // 10 seconds in
 		opentime.NewRationalTime(120, 24), // 5 seconds duration
 	)
-	mediaRef2 := opentimelineio.NewExternalReference("Clip2", "Clip2", &sourceRange2, nil)
-	clip2 := opentimelineio.NewClip("Clip2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
+	mediaRef2 := gotio.NewExternalReference("Clip2", "Clip2", &sourceRange2, nil)
+	clip2 := gotio.NewClip("Clip2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
 
 	track.AppendChild(clip1)
 	track.AppendChild(clip2)
@@ -77,19 +77,19 @@ func TestEncoder_SimpleTimeline(t *testing.T) {
 
 func TestEncoder_WithTransition(t *testing.T) {
 	// Create timeline with dissolve transition
-	timeline := opentimelineio.NewTimeline("Transition Test", nil, nil)
-	track := opentimelineio.NewTrack("V", nil, opentimelineio.TrackKindVideo, nil, nil)
+	timeline := gotio.NewTimeline("Transition Test", nil, nil)
+	track := gotio.NewTrack("V", nil, gotio.TrackKindVideo, nil, nil)
 
 	// Create first clip
 	sourceRange1 := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef1 := opentimelineio.NewExternalReference("Shot1", "Shot1", &sourceRange1, nil)
-	clip1 := opentimelineio.NewClip("Shot1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
+	mediaRef1 := gotio.NewExternalReference("Shot1", "Shot1", &sourceRange1, nil)
+	clip1 := gotio.NewClip("Shot1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
 
 	// Create transition (30 frames dissolve)
-	transition := opentimelineio.NewTransition(
+	transition := gotio.NewTransition(
 		"",
 		"SMPTE_Dissolve",
 		opentime.NewRationalTime(0, 24),
@@ -102,8 +102,8 @@ func TestEncoder_WithTransition(t *testing.T) {
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef2 := opentimelineio.NewExternalReference("Shot2", "Shot2", &sourceRange2, nil)
-	clip2 := opentimelineio.NewClip("Shot2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
+	mediaRef2 := gotio.NewExternalReference("Shot2", "Shot2", &sourceRange2, nil)
+	clip2 := gotio.NewClip("Shot2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
 
 	track.AppendChild(clip1)
 	track.AppendChild(transition)
@@ -134,26 +134,26 @@ func TestEncoder_WithTransition(t *testing.T) {
 
 func TestEncoder_AudioTracks(t *testing.T) {
 	// Create timeline with audio tracks
-	timeline := opentimelineio.NewTimeline("Audio Test", nil, nil)
+	timeline := gotio.NewTimeline("Audio Test", nil, nil)
 
 	// Audio track 1
-	track1 := opentimelineio.NewTrack("A1", nil, opentimelineio.TrackKindAudio, nil, nil)
+	track1 := gotio.NewTrack("A1", nil, gotio.TrackKindAudio, nil, nil)
 	sourceRange1 := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef1 := opentimelineio.NewExternalReference("Audio1", "Audio1", &sourceRange1, nil)
-	clip1 := opentimelineio.NewClip("Audio1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
+	mediaRef1 := gotio.NewExternalReference("Audio1", "Audio1", &sourceRange1, nil)
+	clip1 := gotio.NewClip("Audio1", mediaRef1, &sourceRange1, nil, nil, nil, "", nil)
 	track1.AppendChild(clip1)
 
 	// Audio track 2
-	track2 := opentimelineio.NewTrack("A2", nil, opentimelineio.TrackKindAudio, nil, nil)
+	track2 := gotio.NewTrack("A2", nil, gotio.TrackKindAudio, nil, nil)
 	sourceRange2 := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef2 := opentimelineio.NewExternalReference("Audio2", "Audio2", &sourceRange2, nil)
-	clip2 := opentimelineio.NewClip("Audio2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
+	mediaRef2 := gotio.NewExternalReference("Audio2", "Audio2", &sourceRange2, nil)
+	clip2 := gotio.NewClip("Audio2", mediaRef2, &sourceRange2, nil, nil, nil, "", nil)
 	track2.AppendChild(clip2)
 
 	timeline.Tracks().AppendChild(track1)
@@ -183,20 +183,20 @@ func TestEncoder_AudioTracks(t *testing.T) {
 
 func TestEncoder_ReelNameSanitization(t *testing.T) {
 	// Create timeline with long reel name
-	timeline := opentimelineio.NewTimeline("Reel Test", nil, nil)
-	track := opentimelineio.NewTrack("V", nil, opentimelineio.TrackKindVideo, nil, nil)
+	timeline := gotio.NewTimeline("Reel Test", nil, nil)
+	track := gotio.NewTrack("V", nil, gotio.TrackKindVideo, nil, nil)
 
 	sourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef := opentimelineio.NewExternalReference(
+	mediaRef := gotio.NewExternalReference(
 		"VeryLongReelNameThatExceedsLimit",
 		"VeryLongReelNameThatExceedsLimit",
 		&sourceRange,
 		nil,
 	)
-	clip := opentimelineio.NewClip(
+	clip := gotio.NewClip(
 		"Clip",
 		mediaRef,
 		&sourceRange,
@@ -231,7 +231,7 @@ func TestEncoder_ReelNameSanitization(t *testing.T) {
 }
 
 func TestEncoder_EmptyTimeline(t *testing.T) {
-	timeline := opentimelineio.NewTimeline("Empty", nil, nil)
+	timeline := gotio.NewTimeline("Empty", nil, nil)
 
 	var buf bytes.Buffer
 	encoder := NewEncoder(&buf)
@@ -261,10 +261,10 @@ func TestEncoder_EmptyTimeline(t *testing.T) {
 
 func TestEncoder_MultipleVideoTracks(t *testing.T) {
 	// EDL doesn't support multiple video tracks - should error
-	timeline := opentimelineio.NewTimeline("Multi Video", nil, nil)
+	timeline := gotio.NewTimeline("Multi Video", nil, nil)
 
-	track1 := opentimelineio.NewTrack("V1", nil, opentimelineio.TrackKindVideo, nil, nil)
-	track2 := opentimelineio.NewTrack("V2", nil, opentimelineio.TrackKindVideo, nil, nil)
+	track1 := gotio.NewTrack("V1", nil, gotio.TrackKindVideo, nil, nil)
+	track2 := gotio.NewTrack("V2", nil, gotio.TrackKindVideo, nil, nil)
 
 	timeline.Tracks().AppendChild(track1)
 	timeline.Tracks().AppendChild(track2)
@@ -285,15 +285,15 @@ func TestEncoder_MultipleVideoTracks(t *testing.T) {
 
 func TestEncoder_RoundTrip(t *testing.T) {
 	// Create a timeline, encode it, decode it, and verify
-	originalTimeline := opentimelineio.NewTimeline("Round Trip Test", nil, nil)
-	track := opentimelineio.NewTrack("V", nil, opentimelineio.TrackKindVideo, nil, nil)
+	originalTimeline := gotio.NewTimeline("Round Trip Test", nil, nil)
+	track := gotio.NewTrack("V", nil, gotio.TrackKindVideo, nil, nil)
 
 	sourceRange := opentime.NewTimeRange(
 		opentime.NewRationalTime(0, 24),
 		opentime.NewRationalTime(120, 24),
 	)
-	mediaRef := opentimelineio.NewExternalReference("TestClip", "TestClip", &sourceRange, nil)
-	clip := opentimelineio.NewClip("TestClip", mediaRef, &sourceRange, nil, nil, nil, "", nil)
+	mediaRef := gotio.NewExternalReference("TestClip", "TestClip", &sourceRange, nil)
+	clip := gotio.NewClip("TestClip", mediaRef, &sourceRange, nil, nil, nil, "", nil)
 
 	track.AppendChild(clip)
 	originalTimeline.Tracks().AppendChild(track)
@@ -328,7 +328,7 @@ func TestEncoder_RoundTrip(t *testing.T) {
 		t.Fatalf("Expected 1 child, got %d", len(children))
 	}
 
-	clip, ok := children[0].(*opentimelineio.Clip)
+	clip, ok := children[0].(*gotio.Clip)
 	if !ok {
 		t.Fatal("Child is not a clip")
 	}

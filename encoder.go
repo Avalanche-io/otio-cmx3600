@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 // Encoder writes OpenTimelineIO Timeline to CMX 3600 EDL format.
@@ -47,7 +47,7 @@ func (e *Encoder) SetRate(rate float64) {
 }
 
 // Encode writes the Timeline to EDL format.
-func (e *Encoder) Encode(t *opentimelineio.Timeline) error {
+func (e *Encoder) Encode(t *gotio.Timeline) error {
 	if t == nil {
 		return &EncodeError{Message: "timeline is nil"}
 	}
@@ -102,7 +102,7 @@ func (e *Encoder) Encode(t *opentimelineio.Timeline) error {
 }
 
 // writeHeader writes the EDL header.
-func (e *Encoder) writeHeader(t *opentimelineio.Timeline) error {
+func (e *Encoder) writeHeader(t *gotio.Timeline) error {
 	title := t.Name()
 	if title == "" {
 		title = "Timeline"
@@ -119,7 +119,7 @@ func (e *Encoder) writeHeader(t *opentimelineio.Timeline) error {
 }
 
 // writeTrackEvents writes all events for a track.
-func (e *Encoder) writeTrackEvents(track *opentimelineio.Track, trackType TrackType, startEventNum int) (int, error) {
+func (e *Encoder) writeTrackEvents(track *gotio.Track, trackType TrackType, startEventNum int) (int, error) {
 	eventNumber := startEventNum
 	recordTime := opentime.NewRationalTime(0, e.rate)
 
@@ -128,7 +128,7 @@ func (e *Encoder) writeTrackEvents(track *opentimelineio.Track, trackType TrackT
 		child := children[i]
 
 		// Handle gaps
-		if gap, ok := child.(*opentimelineio.Gap); ok {
+		if gap, ok := child.(*gotio.Gap); ok {
 			duration, err := gap.Duration()
 			if err != nil {
 				return eventNumber, err
@@ -138,7 +138,7 @@ func (e *Encoder) writeTrackEvents(track *opentimelineio.Track, trackType TrackT
 		}
 
 		// Handle clips
-		clip, ok := child.(*opentimelineio.Clip)
+		clip, ok := child.(*gotio.Clip)
 		if !ok {
 			// Skip non-clip, non-gap items
 			continue
@@ -170,7 +170,7 @@ func (e *Encoder) writeTrackEvents(track *opentimelineio.Track, trackType TrackT
 		if mediaRef := clip.MediaReference(); mediaRef != nil {
 			reelName = mediaRef.Name()
 			if reelName == "" {
-				if extRef, ok := mediaRef.(*opentimelineio.ExternalReference); ok {
+				if extRef, ok := mediaRef.(*gotio.ExternalReference); ok {
 					reelName = extRef.TargetURL()
 				}
 			}
@@ -183,7 +183,7 @@ func (e *Encoder) writeTrackEvents(track *opentimelineio.Track, trackType TrackT
 
 		// Check if next child is a transition
 		if i+1 < len(children) {
-			if transition, ok := children[i+1].(*opentimelineio.Transition); ok {
+			if transition, ok := children[i+1].(*gotio.Transition); ok {
 				transitionType := transition.TransitionType()
 				if transitionType == "SMPTE_Dissolve" {
 					editType = EditTypeDissolve

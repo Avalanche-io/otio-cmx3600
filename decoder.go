@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 // Decoder reads CMX 3600 EDL format and produces an OpenTimelineIO Timeline.
@@ -66,7 +66,7 @@ var ascSOPRegex = regexp.MustCompile(`ASC_SOP\s*\(\s*([-+]?[\d.]+)[,\s]+([-+]?[\
 var ascSATRegex = regexp.MustCompile(`ASC_SAT\s+([-+]?[\d.]+)`)
 
 // Decode reads the EDL and returns an OpenTimelineIO Timeline.
-func (d *Decoder) Decode() (*opentimelineio.Timeline, error) {
+func (d *Decoder) Decode() (*gotio.Timeline, error) {
 	events, err := d.parseEvents()
 	if err != nil {
 		return nil, err
@@ -255,8 +255,8 @@ func (d *Decoder) parseEvents() ([]EDLEvent, error) {
 }
 
 // eventsToTimeline converts parsed events to an OpenTimelineIO Timeline.
-func (d *Decoder) eventsToTimeline(events []EDLEvent) (*opentimelineio.Timeline, error) {
-	timeline := opentimelineio.NewTimeline("", nil, nil)
+func (d *Decoder) eventsToTimeline(events []EDLEvent) (*gotio.Timeline, error) {
+	timeline := gotio.NewTimeline("", nil, nil)
 	tracks := timeline.Tracks()
 
 	// Group events by track type
@@ -280,13 +280,13 @@ func (d *Decoder) eventsToTimeline(events []EDLEvent) (*opentimelineio.Timeline,
 }
 
 // createTrack creates a track from a list of events.
-func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentimelineio.Track, error) {
-	kind := opentimelineio.TrackKindVideo
+func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*gotio.Track, error) {
+	kind := gotio.TrackKindVideo
 	if trackType.IsAudioTrack() {
-		kind = opentimelineio.TrackKindAudio
+		kind = gotio.TrackKindAudio
 	}
 
-	track := opentimelineio.NewTrack(string(trackType), nil, kind, nil, nil)
+	track := gotio.NewTrack(string(trackType), nil, kind, nil, nil)
 
 	// Sort events by event number (should already be sorted)
 	// For now, assume they are in order
@@ -321,7 +321,7 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 			if gap.Value() > 0.5 { // Allow for rounding errors
 				// Insert a gap
 				gapDuration := gap
-				gapItem := opentimelineio.NewGapWithDuration(gapDuration)
+				gapItem := gotio.NewGapWithDuration(gapDuration)
 				if err := track.AppendChild(gapItem); err != nil {
 					return nil, err
 				}
@@ -333,12 +333,12 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 		sourceRange := opentime.NewTimeRange(sourceIn, sourceDuration)
 
 		// Create media reference based on reel name
-		var mediaRef opentimelineio.MediaReference
+		var mediaRef gotio.MediaReference
 
 		// Check for generator references (BLACK, BL, BARS)
 		reelUpper := strings.ToUpper(event.ReelName)
 		if reelUpper == "BLACK" || reelUpper == "BL" {
-			genRef := opentimelineio.NewGeneratorReference(
+			genRef := gotio.NewGeneratorReference(
 				"black",
 				"black",
 				nil,
@@ -347,7 +347,7 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 			)
 			mediaRef = genRef
 		} else if reelUpper == "BARS" {
-			genRef := opentimelineio.NewGeneratorReference(
+			genRef := gotio.NewGeneratorReference(
 				"SMPTEBars",
 				"SMPTEBars",
 				nil,
@@ -361,7 +361,7 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 			if event.FilePath != "" {
 				targetURL = event.FilePath
 			}
-			mediaRef = opentimelineio.NewExternalReference(
+			mediaRef = gotio.NewExternalReference(
 				targetURL,
 				targetURL,
 				&sourceRange,
@@ -395,13 +395,13 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 		}
 
 		// Build effects list
-		var effects []opentimelineio.Effect
+		var effects []gotio.Effect
 
 		// Add speed effects
 		if event.SpeedEffect != nil {
 			// Create LinearTimeWarp effect
 			timeScalar := event.SpeedEffect.Speed / d.rate
-			effect := opentimelineio.NewLinearTimeWarp(
+			effect := gotio.NewLinearTimeWarp(
 				"",
 				"LinearTimeWarp",
 				timeScalar,
@@ -412,12 +412,12 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 
 		// Add freeze frame effect
 		if event.FreezeFrame {
-			effect := opentimelineio.NewFreezeFrame("", nil)
+			effect := gotio.NewFreezeFrame("", nil)
 			effects = append(effects, effect)
 		}
 
 		// Build markers list
-		var markers []*opentimelineio.Marker
+		var markers []*gotio.Marker
 		for _, marker := range event.Markers {
 			markerTC, err := opentime.FromTimecode(marker.Timecode, d.rate)
 			if err != nil {
@@ -431,9 +431,9 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 			}
 
 			// Convert color string to MarkerColor
-			markerColor := opentimelineio.MarkerColor(marker.Color)
+			markerColor := gotio.MarkerColor(marker.Color)
 
-			otioMarker := opentimelineio.NewMarker(
+			otioMarker := gotio.NewMarker(
 				marker.Comment,
 				markerRange,
 				markerColor,
@@ -444,7 +444,7 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 		}
 
 		// Create clip
-		clip := opentimelineio.NewClip(
+		clip := gotio.NewClip(
 			clipName,
 			mediaRef,
 			&sourceRange,
@@ -459,18 +459,18 @@ func (d *Decoder) createTrack(trackType TrackType, events []EDLEvent) (*opentime
 		if (event.EditType == EditTypeDissolve || event.EditType == EditTypeWipe) && event.TransitionDuration > 0 {
 			// Create a transition
 			transitionDuration := opentime.NewRationalTime(float64(event.TransitionDuration), d.rate)
-			transitionType := opentimelineio.TransitionTypeSMPTEDissolve
+			transitionType := gotio.TransitionTypeSMPTEDissolve
 			transitionName := ""
 			if event.EditType == EditTypeWipe {
 				// For wipes, use custom transition type and include wipe code in name
-				transitionType = opentimelineio.TransitionTypeCustom
+				transitionType = gotio.TransitionTypeCustom
 				if event.WipeCode != "" {
 					transitionName = event.WipeCode
 				} else {
 					transitionName = "SMPTE_Wipe"
 				}
 			}
-			transition := opentimelineio.NewTransition(
+			transition := gotio.NewTransition(
 				transitionName,
 				transitionType,
 				opentime.NewRationalTime(0, d.rate),

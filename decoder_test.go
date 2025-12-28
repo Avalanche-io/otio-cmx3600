@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/Avalanche-io/gotio/opentime"
-	"github.com/Avalanche-io/gotio/opentimelineio"
+	"github.com/Avalanche-io/gotio"
 )
 
 func TestDecoder_SimpleEDL(t *testing.T) {
@@ -54,10 +54,10 @@ FCM: NON-DROP FRAME
 	clipCount := 0
 	transitionCount := 0
 	for _, child := range children {
-		if _, ok := child.(*opentimelineio.Clip); ok {
+		if _, ok := child.(*gotio.Clip); ok {
 			clipCount++
 		}
-		if _, ok := child.(*opentimelineio.Transition); ok {
+		if _, ok := child.(*gotio.Transition); ok {
 			transitionCount++
 		}
 	}
@@ -71,7 +71,7 @@ FCM: NON-DROP FRAME
 	}
 
 	// Check first clip
-	firstClip := children[0].(*opentimelineio.Clip)
+	firstClip := children[0].(*gotio.Clip)
 	if firstClip.Name() != "Shot1" {
 		t.Errorf("Expected first clip name 'Shot1', got '%s'", firstClip.Name())
 	}
@@ -121,7 +121,7 @@ FCM: NON-DROP FRAME
 		if len(children) != 1 {
 			t.Errorf("Expected 1 child in audio track, got %d", len(children))
 		}
-		if clip, ok := children[0].(*opentimelineio.Clip); ok {
+		if clip, ok := children[0].(*gotio.Clip); ok {
 			clipNames[clip.Name()] = true
 		}
 	}
@@ -168,10 +168,10 @@ FCM: NON-DROP FRAME
 	gapCount := 0
 	clipCount := 0
 	for _, child := range children {
-		if _, ok := child.(*opentimelineio.Gap); ok {
+		if _, ok := child.(*gotio.Gap); ok {
 			gapCount++
 		}
-		if _, ok := child.(*opentimelineio.Clip); ok {
+		if _, ok := child.(*gotio.Clip); ok {
 			clipCount++
 		}
 	}
@@ -186,7 +186,7 @@ FCM: NON-DROP FRAME
 
 	// Check gap duration (5 seconds)
 	for _, child := range children {
-		if gap, ok := child.(*opentimelineio.Gap); ok {
+		if gap, ok := child.(*gotio.Gap); ok {
 			duration, err := gap.Duration()
 			if err != nil {
 				t.Fatalf("Gap duration error = %v", err)
@@ -269,14 +269,14 @@ M2   CLIP1       047.6                01:00:04:05
 		t.Fatalf("Expected 1 clip, got %d", len(children))
 	}
 
-	clip := children[0].(*opentimelineio.Clip)
+	clip := children[0].(*gotio.Clip)
 	effects := clip.Effects()
 	if len(effects) != 1 {
 		t.Fatalf("Expected 1 effect, got %d", len(effects))
 	}
 
 	// Check if it's a LinearTimeWarp
-	if ltw, ok := effects[0].(*opentimelineio.LinearTimeWarp); ok {
+	if ltw, ok := effects[0].(*gotio.LinearTimeWarp); ok {
 		// Time scalar should be speed / rate = 47.6 / 24.0
 		expectedScalar := 47.6 / 24.0
 		if ltw.TimeScalar() != expectedScalar {
@@ -319,9 +319,9 @@ FCM: NON-DROP FRAME
 	// Should have: Clip1, Transition (wipe), Clip2
 	transitionFound := false
 	for _, child := range children {
-		if transition, ok := child.(*opentimelineio.Transition); ok {
+		if transition, ok := child.(*gotio.Transition); ok {
 			transitionFound = true
-			if transition.TransitionType() != opentimelineio.TransitionTypeCustom {
+			if transition.TransitionType() != gotio.TransitionTypeCustom {
 				t.Errorf("Expected Custom transition type, got %v", transition.TransitionType())
 			}
 			if transition.Name() != "W001" {
@@ -364,7 +364,7 @@ FCM: NON-DROP FRAME
 		t.Fatalf("Expected 1 clip, got %d", len(children))
 	}
 
-	clip := children[0].(*opentimelineio.Clip)
+	clip := children[0].(*gotio.Clip)
 
 	// Check clip name has FF suffix stripped
 	if clip.Name() != "FrozenClip" {
@@ -375,7 +375,7 @@ FCM: NON-DROP FRAME
 	effects := clip.Effects()
 	freezeFrameFound := false
 	for _, effect := range effects {
-		if _, ok := effect.(*opentimelineio.FreezeFrame); ok {
+		if _, ok := effect.(*gotio.FreezeFrame); ok {
 			freezeFrameFound = true
 			break
 		}
@@ -425,10 +425,10 @@ FCM: NON-DROP FRAME
 				t.Fatalf("Expected 1 clip, got %d", len(children))
 			}
 
-			clip := children[0].(*opentimelineio.Clip)
+			clip := children[0].(*gotio.Clip)
 			mediaRef := clip.MediaReference()
 
-			if genRef, ok := mediaRef.(*opentimelineio.GeneratorReference); ok {
+			if genRef, ok := mediaRef.(*gotio.GeneratorReference); ok {
 				if genRef.GeneratorKind() != tt.expectedKind {
 					t.Errorf("Expected generator kind '%s', got '%s'", tt.expectedKind, genRef.GeneratorKind())
 				}
@@ -469,7 +469,7 @@ FCM: NON-DROP FRAME
 		t.Fatalf("Expected 1 clip, got %d", len(children))
 	}
 
-	clip := children[0].(*opentimelineio.Clip)
+	clip := children[0].(*gotio.Clip)
 	metadata := clip.Metadata()
 
 	cdl, ok := metadata["cdl"]
@@ -537,7 +537,7 @@ FCM: NON-DROP FRAME
 		t.Fatalf("Expected 1 clip, got %d", len(children))
 	}
 
-	clip := children[0].(*opentimelineio.Clip)
+	clip := children[0].(*gotio.Clip)
 	markers := clip.Markers()
 
 	if len(markers) != 2 {
@@ -625,10 +625,10 @@ FCM: NON-DROP FRAME
 				t.Fatalf("Expected 1 clip, got %d", len(children))
 			}
 
-			clip := children[0].(*opentimelineio.Clip)
+			clip := children[0].(*gotio.Clip)
 			mediaRef := clip.MediaReference()
 
-			if extRef, ok := mediaRef.(*opentimelineio.ExternalReference); ok {
+			if extRef, ok := mediaRef.(*gotio.ExternalReference); ok {
 				if extRef.TargetURL() != tt.expectedPath {
 					t.Errorf("Expected target URL '%s', got '%s'", tt.expectedPath, extRef.TargetURL())
 				}
@@ -728,21 +728,21 @@ M2   ZZ100_50       047.6                01:00:04:05
 	wipeCount := 0
 
 	for _, child := range children {
-		if clip, ok := child.(*opentimelineio.Clip); ok {
+		if clip, ok := child.(*gotio.Clip); ok {
 			clipCount++
 
 			// Check for generator references
-			if genRef, ok := clip.MediaReference().(*opentimelineio.GeneratorReference); ok {
+			if genRef, ok := clip.MediaReference().(*gotio.GeneratorReference); ok {
 				generatorCount++
 				t.Logf("Generator: %s - %s", clip.Name(), genRef.GeneratorKind())
 			}
 
 			// Check for speed effects
 			for _, effect := range clip.Effects() {
-				if _, ok := effect.(*opentimelineio.LinearTimeWarp); ok {
+				if _, ok := effect.(*gotio.LinearTimeWarp); ok {
 					speedEffectCount++
 				}
-				if _, ok := effect.(*opentimelineio.FreezeFrame); ok {
+				if _, ok := effect.(*gotio.FreezeFrame); ok {
 					freezeFrameCount++
 				}
 			}
@@ -756,9 +756,9 @@ M2   ZZ100_50       047.6                01:00:04:05
 			markerCount += len(clip.Markers())
 		}
 
-		if transition, ok := child.(*opentimelineio.Transition); ok {
+		if transition, ok := child.(*gotio.Transition); ok {
 			transitionCount++
-			if transition.TransitionType() == opentimelineio.TransitionTypeCustom {
+			if transition.TransitionType() == gotio.TransitionTypeCustom {
 				wipeCount++
 			}
 		}
